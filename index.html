@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PDF Viewer</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+		}
+		embed {
+			width: 100%;
+			height: 500px;
+			border: 1px solid #ccc;
+			margin-top: 20px;
+		}
+		button {
+			padding: 10px 20px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+		input {
+			margin-right: 10px;
+			padding: 5px;
+			font-size: 14px;
+			width: 300px;
+		}
+	</style>
+</head>
+<body>
+	<h1>PDF Viewer</h1>
+	<!--<input id="filepath" type="text" value="links.pdf" placeholder="Enter file path (e.g., myfile.pdf)" />
+	<input id="topLevelUrl" type="text" value="https://example.com" placeholder="Enter top-level URL (e.g., https://example.com)" />-->
+	<button id="loadPdf">Load PDF</button>
+	<button id="withoutBtn">Load PDF Without topLevelUrl</button>
+	<embed id="pdfViewer" type="application/pdf" src="" top-level-url="https://example.com" />
+
+	<script>
+		const filepath = 'links.pdf';
+		const embedTag = document.getElementById('pdfViewer');
+		const topLevelUrl = embedTag.getAttribute('top-level-url'); 
+		
+		document.getElementById('withoutBtn').addEventListener('click', async () => {
+			embedTag.src=""
+			if (!filepath || !topLevelUrl) {
+				alert('Please provide both file path and top-level URL.');
+				return;
+			}
+			
+			try {
+				const url = `http://localhost:3000/report?filepath=${encodeURIComponent(filepath)}`
+				embedTag.src = url;
+				
+				const response = await fetch(url);
+				
+				if (response.ok) {
+					// If the file is successfully fetched, update the embed's src
+					const blob = await response.blob();
+					document.getElementById('pdfViewer').src = URL.createObjectURL(blob);
+				} else {
+					// Handle errors
+					const errorText = await response.text();
+					alert(`Error: ${errorText}`);
+				}
+			} catch (error) {
+				alert('An error occurred: ' + error.message);
+			}
+			
+		})
+		document.getElementById('loadPdf').addEventListener('click', async () => {
+			embedTag.src=""
+			if (!filepath || !topLevelUrl) {
+				alert('Please provide both file path and top-level URL.');
+				return;
+			}
+
+			try {
+				const url = `http://localhost:3000/report?filepath=${encodeURIComponent(filepath)}&top-level-url=${encodeURIComponent(topLevelUrl)}`
+				embedTag.src = url;
+				const response = await fetch(url);
+				
+				if (response.ok) {
+					// If the file is successfully fetched, update the embed's src
+					const blob = await response.blob();
+					document.getElementById('pdfViewer').src = URL.createObjectURL(blob);
+				} else {
+					// Handle errors
+					const errorText = await response.text();
+					alert(`Error: ${errorText}`);
+				}
+			} catch (error) {
+				alert('An error occurred: ' + error.message);
+			}
+		});
+	</script>
+</body>
+</html>
