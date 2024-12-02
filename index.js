@@ -6,6 +6,14 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, "public")));
+
+// Serve index.html for the root route
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 app.get("/report", (req, res) => {
   const { filepath, "top-level-url": topLevelUrl } = req.query;
 
